@@ -38,8 +38,8 @@ license:              BSD3
 license-file:         LICENSE.md
 author:               Mark Karpov <markkarpov@opmbx.org>
 maintainer:           Mark Karpov <markkarpov@opmbx.org>
-homepage:             https://github.com/mrkkrp/htaglib
-bug-reports:          https://github.com/mrkkrp/htaglib/issues
+homepage:             https://github.com/mrkkrp/slug
+bug-reports:          https://github.com/mrkkrp/slug/issues
 category:             Web
 synopsis:             Type-safe slugs for Yesod ecosystem
 build-type:           Simple
