@@ -31,6 +31,7 @@
 -- ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 -- POSSIBILITY OF SUCH DAMAGE.
 
+{-# LANGUAGE CPP              #-}
 {-# OPTIONS -fno-warn-orphans #-}
 
 module Main (main) where
@@ -47,6 +48,10 @@ import Test.QuickCheck
 import Web.PathPieces
 import Web.Slug
 import qualified Data.Text as T
+
+#if !MIN_VERSION_base(4,8,0)
+import Control.Applicative ((<$>))
+#endif
 
 main :: IO ()
 main = defaultMain [tests]
