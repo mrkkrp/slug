@@ -15,7 +15,7 @@ little package eliminates some boilerplate you might find yourself writing.
 ## Quick start
 
 The package provides data type `Slug` that is instance of various type
-classes, so it can be used with Persistent or as part of route. It's also
+classes, so it can be used with Persistent or as part of route. It also
 works with `aeson` package.
 
 The slugs are completely type-safe. When you have a `Slug`, you can be sure
