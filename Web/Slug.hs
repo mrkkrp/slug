@@ -16,9 +16,8 @@ module Web.Slug
   , SlugException (..) )
 where
 
-import Control.Applicative (empty)
 import Control.Exception (Exception)
-import Control.Monad ((>=>))
+import Control.Monad (mzero, (>=>))
 import Control.Monad.Catch (MonadThrow (..))
 import Data.Aeson.Types (ToJSON (..), FromJSON (..))
 import Data.Char (isAlphaNum)
@@ -29,7 +28,7 @@ import Database.Persist.Sql (PersistFieldSql (..))
 import Database.Persist.Types (SqlType (..))
 import Web.PathPieces
 import qualified Data.Aeson.Types as A
-import qualified Data.Text        as T
+import qualified Data.Text as T
 
 -- | This exception is thrown by 'mkSlug' when its input cannot be converted
 -- into proper 'Slug'.
@@ -47,7 +46,7 @@ instance Exception SlugException
 --     * it's not empty;
 --     * it consists only of alpha-numeric groups of characters (words)
 --     separated by @\'-\'@ dashes in such a way that entire slug cannot
---     start and end in a dash and also two dashes in a row cannot be found;
+--     start or end in a dash and also two dashes in a row cannot be found;
 --     * every character with defined notion of case is lower-cased.
 --
 -- Slugs are good for semantic URLs and also can be used as identifier of a
@@ -87,8 +86,8 @@ instance ToJSON Slug where
   toJSON = toJSON . unSlug
 
 instance FromJSON Slug where
-  parseJSON (A.String v) = maybe empty pure (mkSlug v)
-  parseJSON _            = empty
+  parseJSON (A.String v) = maybe mzero return (mkSlug v)
+  parseJSON _            = mzero
 
 instance PersistField Slug where
   toPersistValue   = toPersistValue . unSlug
