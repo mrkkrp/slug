@@ -9,6 +9,8 @@
 --
 -- Type-safe slug implementation for Yesod ecosystem.
 
+{-# LANGUAGE DeriveDataTypeable #-}
+
 module Web.Slug
   ( Slug
   , mkSlug
