@@ -44,7 +44,7 @@ Use it in route file like this:
 /post/#Slug PostR GET
 ```
 
-In Haskell code, create slugs from `Text` with `mkSlug` and extract its
+In Haskell code, create slugs from `Text` with `mkSlug` and extract their
 textual representation with `unSlug`. The following property holds:
 
 ```haskell
