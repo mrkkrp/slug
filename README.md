@@ -19,7 +19,15 @@ classes, so it can be used with Persistent or as part of route. It's also
 works with `aeson` package.
 
 The slugs are completely type-safe. When you have a `Slug`, you can be sure
-that there is a valid slug inside.
+that there is a valid slug inside. Valid slug has the following qualities:
+
+* it's not empty;
+
+* it consists only of alpha-numeric groups of characters (words) separated
+  by `'-'` dashes in such a way that entire slug cannot start or end in a
+  dash and also two dashes in a row cannot be found;
+
+* every character with defined notion of case is lower-cased.
 
 To use the package with persistent models, just import `Web.Slug` and add it
 to model file:
@@ -34,6 +42,13 @@ Use it in route file like this:
 
 ```
 /post/#Slug PostR GET
+```
+
+In Haskell code, create slugs from `Text` with `mkSlug` and extract its
+textual representation with `unSlug`. The following property holds:
+
+```haskell
+mkSlug = mkSlug >=> mkSlug . unSlug
 ```
 
 ## License
