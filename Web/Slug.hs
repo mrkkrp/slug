@@ -22,7 +22,7 @@ module Web.Slug
 where
 
 import Control.Exception (Exception)
-import Control.Monad (mzero, (>=>))
+import Control.Monad (mzero, (>=>), liftM)
 import Control.Monad.Catch (MonadThrow (..))
 import Data.Aeson.Types (ToJSON (..), FromJSON (..))
 import Data.Char (isAlphaNum)
@@ -94,10 +94,7 @@ getSlugWords :: Text -> [Text]
 getSlugWords = T.words . T.toLower . T.map f . T.replace "'" ""
   where f x = if isAlphaNum x then x else ' '
 
--- | Convert 'Text' into 'Slug' only when it is already valid slug. This
--- function is case-insensitive, which means that @\"Something\"@ is valid
--- input producing @\"something\"@ slug, while @\"Something?\"@ is invalid
--- input.
+-- | Convert 'Text' into 'Slug' only when it is already valid slug.
 --
 -- This function can throw 'SlugException' exception using 'InvalidSlug'
 -- constructor.
@@ -105,7 +102,7 @@ getSlugWords = T.words . T.toLower . T.map f . T.replace "'" ""
 parseSlug :: MonadThrow m => Text -> m Slug
 parseSlug v = mkSlug v >>= check
   where check s =
-          if unSlug s == T.toLower v
+          if unSlug s == v
           then return s
           else throwM (InvalidSlug v)
 
@@ -130,7 +127,7 @@ instance Show Slug where
 
 instance Read Slug where
   readsPrec n = (readsPrec n :: ReadS Text) >=> f
-    where f (s, t) = (,t) <$> parseSlug s
+    where f (s, t) = (,t) `liftM` parseSlug s
 
 instance ToJSON Slug where
   toJSON = toJSON . unSlug
