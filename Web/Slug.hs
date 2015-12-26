@@ -17,6 +17,7 @@ module Web.Slug
   , mkSlug
   , unSlug
   , parseSlug
+  , truncateSlug
   , SlugException (..) )
 where
 
@@ -40,11 +41,13 @@ import qualified Data.Text as T
 data SlugException
   = InvalidInput Text  -- ^ Slug cannot be generated for given text
   | InvalidSlug  Text  -- ^ Input is not a valid slug, see 'parseSlug'
-  deriving (Typeable)
+  | InvalidLength Int  -- ^ Requested slug length is not a positive number
+ deriving (Typeable)
 
 instance Show SlugException where
   show (InvalidInput text) = "Cannot build slug for " ++ show text
   show (InvalidSlug  text) = "The text is not a valid slug " ++ show text
+  show (InvalidLength n)   = "Invalid slug length: " ++ show n
 
 instance Exception SlugException
 
@@ -69,7 +72,8 @@ newtype Slug = Slug
 -- something like that.
 --
 -- Note that result is inside 'MonadThrow', that means you can just get it
--- in 'Maybe', in more complex contexts it will throw 'SlugException'.
+-- in 'Maybe', in more complex contexts it will throw 'SlugException'
+-- exception using 'InvalidInput' constructor.
 --
 -- This function also have a useful property:
 --
@@ -104,6 +108,22 @@ parseSlug v = mkSlug v >>= check
           if unSlug s == T.toLower v
           then return s
           else throwM (InvalidSlug v)
+
+-- | Ensure that given 'Slug' is not longer than given maximum number of
+-- characters. If truncated slug ends in a dash, remove that dash too. (Dash
+-- at the end would violate properties described in documentation for
+-- 'Slug'.)
+--
+-- If the first argument is not a positive number, 'SlugException' is thrown
+-- using 'InvalidLength' constructor.
+
+truncateSlug :: MonadThrow m
+  => Int               -- ^ Maximum length of slug, must be greater than 0
+  -> Slug              -- ^ Original non-truncated slug
+  -> m Slug            -- ^ Truncated slug
+truncateSlug n v
+  | n < 1     = throwM (InvalidLength n)
+  | otherwise = mkSlug . T.take n . unSlug $ v
 
 instance Show Slug where
   show = show . unSlug
