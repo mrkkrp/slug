@@ -10,11 +10,13 @@
 -- Type-safe slug implementation for Yesod ecosystem.
 
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE TupleSections      #-}
 
 module Web.Slug
   ( Slug
   , mkSlug
   , unSlug
+  , parseSlug
   , SlugException (..) )
 where
 
@@ -35,10 +37,14 @@ import qualified Data.Text as T
 -- | This exception is thrown by 'mkSlug' when its input cannot be converted
 -- into proper 'Slug'.
 
-data SlugException = InvalidInput Text deriving (Typeable)
+data SlugException
+  = InvalidInput Text  -- ^ Slug cannot be generated for given text
+  | InvalidSlug  Text  -- ^ Input is not a valid slug, see 'parseSlug'
+  deriving (Typeable)
 
 instance Show SlugException where
   show (InvalidInput text) = "Cannot build slug for " ++ show text
+  show (InvalidSlug  text) = "The text is not a valid slug " ++ show text
 
 instance Exception SlugException
 
@@ -56,7 +62,7 @@ instance Exception SlugException
 
 newtype Slug = Slug
   { unSlug :: Text     -- ^ Get textual representation of 'Slug'.
-  } deriving (Eq, Show, Typeable)
+  } deriving (Eq, Typeable)
 
 -- | Create 'Slug' from 'Text', all necessary transformations are
 -- applied. Argument of this function can be title of an article or
@@ -84,22 +90,43 @@ getSlugWords :: Text -> [Text]
 getSlugWords = T.words . T.toLower . T.map f . T.replace "'" ""
   where f x = if isAlphaNum x then x else ' '
 
+-- | Convert 'Text' into 'Slug' only when it is already valid slug. This
+-- function is case-insensitive, which means that @\"Something\"@ is valid
+-- input producing @\"something\"@ slug, while @\"Something?\"@ is invalid
+-- input.
+--
+-- This function can throw 'SlugException' exception using 'InvalidSlug'
+-- constructor.
+
+parseSlug :: MonadThrow m => Text -> m Slug
+parseSlug v = mkSlug v >>= check
+  where check s =
+          if unSlug s == T.toLower v
+          then return s
+          else throwM (InvalidSlug v)
+
+instance Show Slug where
+  show = show . unSlug
+
+instance Read Slug where
+  readsPrec n = (readsPrec n :: ReadS Text) >=> f
+    where f (s, t) = (,t) <$> parseSlug s
+
 instance ToJSON Slug where
   toJSON = toJSON . unSlug
 
 instance FromJSON Slug where
-  parseJSON (A.String v) = maybe mzero return (mkSlug v)
+  parseJSON (A.String v) = maybe mzero return (parseSlug v)
   parseJSON _            = mzero
 
 instance PersistField Slug where
   toPersistValue   = toPersistValue . unSlug
   fromPersistValue =
-    fromPersistValue >=> either (Left . T.pack . show) Right . mkSlug
+    fromPersistValue >=> either (Left . T.pack . show) Right . parseSlug
 
 instance PersistFieldSql Slug where
   sqlType = const SqlString
 
 instance PathPiece Slug where
-  fromPathPiece v = mkSlug v >>= check
-    where check s = if unSlug s == T.toLower v then Just s else Nothing
-  toPathPiece = unSlug
+  fromPathPiece = parseSlug
+  toPathPiece   = unSlug
