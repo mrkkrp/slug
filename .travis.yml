@@ -5,17 +5,17 @@ sudo: false
 matrix:
   include:
     - env: CABALVER=1.16 GHCVER=7.6.3
-      addons: {apt: {packages: [cabal-install-1.16,ghc-7.6.3,libtagc0-dev], sources: [hvr-ghc]}}
+      addons: {apt: {packages: [cabal-install-1.16,ghc-7.6.3], sources: [hvr-ghc]}}
     - env: CABALVER=1.18 GHCVER=7.8.4
-      addons: {apt: {packages: [cabal-install-1.18,ghc-7.8.4,libtagc0-dev], sources: [hvr-ghc]}}
+      addons: {apt: {packages: [cabal-install-1.18,ghc-7.8.4], sources: [hvr-ghc]}}
     - env: CABALVER=1.22 GHCVER=7.10.1
-      addons: {apt: {packages: [cabal-install-1.22,ghc-7.10.1,libtagc0-dev],sources: [hvr-ghc]}}
+      addons: {apt: {packages: [cabal-install-1.22,ghc-7.10.1],sources: [hvr-ghc]}}
     - env: CABALVER=1.22 GHCVER=7.10.2
-      addons: {apt: {packages: [cabal-install-1.22,ghc-7.10.2,libtagc0-dev],sources: [hvr-ghc]}}
+      addons: {apt: {packages: [cabal-install-1.22,ghc-7.10.2],sources: [hvr-ghc]}}
     - env: CABALVER=1.22 GHCVER=7.10.3
-      addons: {apt: {packages: [cabal-install-1.22,ghc-7.10.3,libtagc0-dev],sources: [hvr-ghc]}}
+      addons: {apt: {packages: [cabal-install-1.22,ghc-7.10.3],sources: [hvr-ghc]}}
     - env: CABALVER=head GHCVER=head
-      addons: {apt: {packages: [cabal-install-head,ghc-head,libtagc0-dev],  sources: [hvr-ghc]}}
+      addons: {apt: {packages: [cabal-install-head,ghc-head],  sources: [hvr-ghc]}}
 
   allow_failures:
     - env: CABALVER=head GHCVER=head
@@ -27,7 +27,7 @@ install:
  - cabal --version
  - echo "$(ghc --version) [$(ghc --print-project-git-commit-id 2> /dev/null || echo '?')]"
  - travis_retry cabal update
- - cabal install --only-dependencies --enable-tests
+ - cabal install --reorder-goals --only-dependencies --enable-tests
 
 script:
  - case "$CABALVER" in
