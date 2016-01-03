@@ -1,3 +1,7 @@
+## Slug 0.1.2
+
+* Improved error messages in `parseJSON`.
+
 ## Slug 0.1.1
 
 * Add `Read` instance of `Slug`.

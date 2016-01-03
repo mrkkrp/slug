@@ -22,7 +22,7 @@ module Web.Slug
 where
 
 import Control.Exception (Exception)
-import Control.Monad (mzero, (>=>), liftM)
+import Control.Monad ((>=>), liftM)
 import Control.Monad.Catch (MonadThrow (..))
 import Data.Aeson.Types (ToJSON (..), FromJSON (..))
 import Data.Char (isAlphaNum)
@@ -32,8 +32,8 @@ import Database.Persist.Class (PersistField (..))
 import Database.Persist.Sql (PersistFieldSql (..))
 import Database.Persist.Types (SqlType (..))
 import Web.PathPieces
-import qualified Data.Aeson.Types as A
-import qualified Data.Text as T
+import qualified Data.Aeson as A
+import qualified Data.Text  as T
 
 -- | This exception is thrown by 'mkSlug' when its input cannot be converted
 -- into proper 'Slug'.
@@ -133,8 +133,10 @@ instance ToJSON Slug where
   toJSON = toJSON . unSlug
 
 instance FromJSON Slug where
-  parseJSON (A.String v) = maybe mzero return (parseSlug v)
-  parseJSON _            = mzero
+  parseJSON = A.withText "Slug" $ \txt ->
+    case parseSlug txt of
+      Left err -> fail (show err)
+      Right val -> return val
 
 instance PersistField Slug where
   toPersistValue   = toPersistValue . unSlug
