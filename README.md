@@ -53,6 +53,6 @@ mkSlug = mkSlug >=> mkSlug . unSlug
 
 ## License
 
-Copyright © 2015 Mark Karpov
+Copyright © 2015–2016 Mark Karpov
 
 Distributed under BSD 3 clause license.

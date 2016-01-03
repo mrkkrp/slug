@@ -1,6 +1,6 @@
 -- |
 -- Module      :  Web.Slug
--- Copyright   :  © 2015 Mark Karpov
+-- Copyright   :  © 2015–2016 Mark Karpov
 -- License     :  BSD 3 clause
 --
 -- Maintainer  :  Mark Karpov <markkarpov@openmailbox.org>
