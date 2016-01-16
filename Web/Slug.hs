@@ -75,7 +75,7 @@ newtype Slug = Slug
 -- in 'Maybe', in more complex contexts it will throw 'SlugException'
 -- exception using 'InvalidInput' constructor.
 --
--- This function also have a useful property:
+-- This function also has a useful property:
 --
 -- > mkSlug = mkSlug >=> mkSlug . unSlug
 
