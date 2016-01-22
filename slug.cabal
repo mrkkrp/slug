@@ -40,7 +40,7 @@ author:               Mark Karpov <markkarpov@opmbx.org>
 maintainer:           Mark Karpov <markkarpov@opmbx.org>
 homepage:             https://github.com/mrkkrp/slug
 bug-reports:          https://github.com/mrkkrp/slug/issues
-category:             Web
+category:             Web, Yesod
 synopsis:             Type-safe slugs for Yesod ecosystem
 build-type:           Simple
 description:          Type-safe slugs for Yesod ecosystem.
