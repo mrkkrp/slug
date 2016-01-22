@@ -32,7 +32,7 @@
 -- POSSIBILITY OF SUCH DAMAGE.
 
 name:                 slug
-version:              0.1.1
+version:              0.1.2
 cabal-version:        >= 1.10
 license:              BSD3
 license-file:         LICENSE.md
@@ -80,7 +80,7 @@ test-suite tests
                     , base                       >= 4.6 && < 5
                     , exceptions                 >= 0.6
                     , path-pieces                >= 0.1.5
-                    , slug                       >= 0.1.1
+                    , slug                       >= 0.1.2
                     , test-framework             >= 0.6 && < 1
                     , test-framework-quickcheck2 >= 0.3 && < 0.4
                     , text                       >= 1.0
