@@ -1,4 +1,3 @@
--- -*- Mode: Haskell; -*-
 --
 -- Slug tests.
 --
