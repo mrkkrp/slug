@@ -63,9 +63,7 @@ instance Exception SlugException
 -- Slugs are good for semantic URLs and also can be used as identifier of a
 -- sort in some cases.
 
-newtype Slug = Slug
-  { unSlug :: Text     -- ^ Get textual representation of 'Slug'.
-  } deriving (Eq, Typeable)
+newtype Slug = Slug Text deriving (Eq, Typeable)
 
 -- | Create 'Slug' from 'Text', all necessary transformations are
 -- applied. Argument of this function can be title of an article or
@@ -85,6 +83,11 @@ mkSlug text =
   in if null ws
      then throwM (InvalidInput text)
      else return . Slug . T.intercalate "-" $ ws
+
+-- | Get textual representation if 'Slug'.
+
+unSlug :: Slug -> Text
+unSlug (Slug x) = x
 
 -- | Convert 'Text' to possibly empty collection of words. Every word is
 -- guaranteed to be non-empty alpha-numeric lowercased sequence of

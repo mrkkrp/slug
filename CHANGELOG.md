@@ -1,3 +1,7 @@
+## Slug 0.1.3
+
+* Export plain function `unSlug` instead of record selector `unSlug`.
+
 ## Slug 0.1.2
 
 * Improved error messages in `parseJSON`.
