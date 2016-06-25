@@ -1,3 +1,7 @@
+## Slug 0.1.4
+
+* Derive `Ord` and `Data` instances for `Slug`.
+
 ## Slug 0.1.3
 
 * Export plain function `unSlug` instead of record selector `unSlug`.

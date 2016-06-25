@@ -26,6 +26,7 @@ import Control.Monad ((>=>), liftM)
 import Control.Monad.Catch (MonadThrow (..))
 import Data.Aeson.Types (ToJSON (..), FromJSON (..))
 import Data.Char (isAlphaNum)
+import Data.Data (Data)
 import Data.Text (Text)
 import Data.Typeable (Typeable)
 import Database.Persist.Class (PersistField (..))
@@ -63,7 +64,7 @@ instance Exception SlugException
 -- Slugs are good for semantic URLs and also can be used as identifier of a
 -- sort in some cases.
 
-newtype Slug = Slug Text deriving (Eq, Typeable)
+newtype Slug = Slug Text deriving (Eq, Ord, Data, Typeable)
 
 -- | Create 'Slug' from 'Text', all necessary transformations are
 -- applied. Argument of this function can be title of an article or
