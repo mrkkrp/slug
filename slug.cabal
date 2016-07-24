@@ -43,7 +43,7 @@ category:             Web, Yesod
 synopsis:             Type-safe slugs for Yesod ecosystem
 build-type:           Simple
 description:          Type-safe slugs for Yesod ecosystem.
-extra-source-files:   CHANGELOG.md
+extra-doc-files:      CHANGELOG.md
                     , README.md
 
 flag dev
