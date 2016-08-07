@@ -1,3 +1,7 @@
+## Slug 0.1.5
+
+* Allow Aeson 1.0.
+
 ## Slug 0.1.4
 
 * Derive `Ord` and `Data` instances for `Slug`.
