@@ -8,6 +8,8 @@
 
 * Derived `Eq` for `SlugException`.
 
+* Drop support for GHC 7.6.
+
 ## Slug 0.1.5
 
 * Allow Aeson 1.0.
