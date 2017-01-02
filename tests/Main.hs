@@ -36,13 +36,11 @@
 module Main (main) where
 
 import Control.Monad ((>=>))
-import Control.Monad.Catch (MonadThrow (..))
 import Data.Char (isAlphaNum, isUpper)
 import Data.Function (on)
-import Data.Maybe (fromJust, isJust, isNothing)
+import Data.Maybe (isJust, isNothing)
 import Data.Text (Text)
-import Test.Framework
-import Test.Framework.Providers.QuickCheck2 (testProperty)
+import Test.Hspec
 import Test.QuickCheck
 import Web.PathPieces
 import Web.Slug
@@ -53,60 +51,73 @@ import Control.Applicative ((<$>))
 #endif
 
 main :: IO ()
-main = defaultMain [tests]
+main = hspec spec
 
-tests :: Test
-tests = testGroup "Slug properties"
-  [ -- Properties of valid slugs
-    testProperty "Slug cannot be empty" prop_nonEmpty
-  , testProperty "Only dashes and alpha-numeric" prop_validContent
-  , testProperty "Slug cannot begin with a dash" prop_noBegDash
-  , testProperty "Slug cannot end with a dash" prop_noEndDash
-  , testProperty "Non-empty word between dashes" prop_noEmptyWords
-  , testProperty "No upper-cased chars in slugs" prop_noUpperCase
-    -- Properties of helper-functions
-  , testProperty "Slug of slug is the slug" prop_changeStops
-  , testProperty "Parsing of slugs (success)" prop_parsing0
-  , testProperty "Parsing of slugs (failure)" prop_parsing1
-  , testProperty "Slug truncation" prop_truncation
-  , testProperty "Reading of slugs (success)" prop_read0
-  , testProperty "Reading of slugs (failure)" prop_read1
-    -- Additional properties
-  , testProperty "Rendering of slugs" prop_showSlug
-  , testProperty "Alpha-numerics are necessary and sufficient" prop_needAlphaNum
-  , testProperty "Path pieces accept correct slugs" prop_pathPiece
-  ]
-
-instance Arbitrary Text where
-  arbitrary = T.pack <$> arbitrary
-
-instance Arbitrary Slug where
-  arbitrary = fromJust <$> ((mkSlug <$> arbitrary) `suchThat` isJust)
+spec :: Spec
+spec = do
+  describe "slug properties" $ do
+    it "cannot be empty" $
+      property $ \slug ->
+        unSlug slug `shouldNotSatisfy` T.null
+    it "contains only dashes and alpha-numeric characters" $
+      property $ \slug ->
+        let f x = isAlphaNum x || x == '-'
+        in unSlug slug `shouldSatisfy` T.all f
+    it "does not begin with a dash" $
+      property $ \slug ->
+        T.head (unSlug slug) `shouldNotBe` '-'
+    it "does not end with a dash" $
+      property $ \slug ->
+        T.last (unSlug slug) `shouldNotBe` '-'
+    it "does not contain empty words between dashes" $
+      property $ \slug ->
+        T.splitOn "-" (unSlug slug) `shouldNotSatisfy` any T.null
+    it "no upper-cased chars found in slugs" $
+      property $ \slug ->
+        unSlug slug `shouldNotSatisfy` T.any isUpper
+    it "showed Slug looks the same as its inner Text" $
+      property $ \slug ->
+        show slug === show (unSlug slug)
+    it "showed Slug can be read back again" $
+      property $ \slug ->
+        read (show slug) === (slug :: Slug)
+    it "incorrect Slug won't be read successfully" $
+      property $ \x -> isNothing (parseSlug x) ==>
+        (reads (show x) :: [(Slug, String)]) === []
+    it "valid Slug text is a valid path piece" $
+      property $ \slug ->
+        fromPathPiece (unSlug slug) === Just slug
+  describe "mkSlug" $ do
+    it "Slug transformation in idempotent" $
+      property $ \x ->
+        let f = mkSlug
+            g = mkSlug >=> mkSlug . unSlug
+        in f x ==== g x
+    it "text containing at least one alpha-num char is Sluggable" $ do
+      let hasAlphaNum = isJust . T.find isAlphaNum
+      property $ \x -> hasAlphaNum x ==>
+        isJust (mkSlug x) `shouldBe` True
+  describe "parseSlug" $ do
+    it "succeeds on valid input" $
+      property $ \slug ->
+        parseSlug (unSlug slug) `shouldReturn` slug
+    it "fails on invalid input" $
+      property $ \x ->
+        (unSlug <$> mkSlug x) `notElem` [Nothing, Just x] ==>
+          parseSlug x `shouldThrow` (== InvalidSlug x)
+  describe "truncateSlug" $ do
+    context "when required length is less than 0" $
+      it "throws InvalidLength" $
+        property $ \n slug -> (n < 1) ==>
+          truncateSlug n slug `shouldThrow` (== InvalidLength n)
+    context "when required length is OK" $
+      it "truncates to this length or one less" $
+        property $ \n slug -> (n > 0) ==> do
+          t <- truncateSlug n slug
+          T.length (unSlug t) `shouldSatisfy` (<= n)
 
 ----------------------------------------------------------------------------
--- Properties of valid slugs
-
-prop_nonEmpty :: Slug -> Property
-prop_nonEmpty = expectFailure . T.null . unSlug
-
-prop_validContent :: Slug -> Property
-prop_validContent = property . T.all f . unSlug
-  where f x = isAlphaNum x || x == '-'
-
-prop_noBegDash :: Slug -> Property
-prop_noBegDash s = expectFailure $ T.head (unSlug s) === '-'
-
-prop_noEndDash :: Slug -> Property
-prop_noEndDash s = expectFailure $ T.last (unSlug s) === '-'
-
-prop_noEmptyWords :: Slug -> Property
-prop_noEmptyWords = expectFailure . any T.null . T.splitOn "-" . unSlug
-
-prop_noUpperCase :: Slug -> Property
-prop_noUpperCase = expectFailure . T.any isUpper . unSlug
-
-----------------------------------------------------------------------------
--- Properties of helper-functions
+-- Helpers
 
 infix 4 ====
 
@@ -116,43 +127,5 @@ infix 4 ====
 displayLeft :: Show a => Either a b -> Either String b
 displayLeft = either (Left . show) Right
 
-prop_changeStops :: Text -> Property
-prop_changeStops x = f x ==== g x
-  where f = mkSlug
-        g = mkSlug >=> mkSlug . unSlug
-
-prop_parsing0 :: Slug -> Property
-prop_parsing0 s = parseSlug (unSlug s) === Just s
-
-prop_parsing1 :: Text -> Property
-prop_parsing1 x = (unSlug <$> mkSlug x) `notElem` [Nothing, Just x]
-  ==> parseSlug x ==== throwM (InvalidSlug x)
-
-prop_truncation :: Int -> Slug -> Property
-prop_truncation n s =
-  case truncateSlug n s of
-    Left e -> n < 1 ==> show e === show (InvalidLength n)
-    Right t -> n > 0 ==> T.length (unSlug t) <= n
-
-prop_read0 :: Slug -> Property
-prop_read0 s = read (show s) === s
-
-prop_read1 :: Text -> Property
-prop_read1 s = isNothing (parseSlug s)
-  ==> (reads (show s) :: [(Slug, String)]) === []
-
-----------------------------------------------------------------------------
--- Additional properties
-
-prop_showSlug :: Slug -> Property
-prop_showSlug s = show s === show (unSlug s)
-
-prop_needAlphaNum :: Text -> Property
-prop_needAlphaNum x = hasAlphaNum x ==> isJust (mkSlug x)
-  where hasAlphaNum = isJust . T.find isAlphaNum
-
-prop_pathPiece :: Text -> Property
-prop_pathPiece x =
-  case mkSlug x of
-    Nothing -> property True
-    Just slug -> fromPathPiece (unSlug slug) === Just slug
+instance Arbitrary Text where
+  arbitrary = T.pack <$> arbitrary

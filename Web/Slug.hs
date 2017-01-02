@@ -9,6 +9,7 @@
 --
 -- Type-safe slug implementation for Yesod ecosystem.
 
+{-# LANGUAGE CPP                #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE TupleSections      #-}
 
@@ -27,14 +28,20 @@ import Control.Monad.Catch (MonadThrow (..))
 import Data.Aeson.Types (ToJSON (..), FromJSON (..))
 import Data.Char (isAlphaNum)
 import Data.Data (Data)
+import Data.Maybe (isJust, fromJust)
 import Data.Text (Text)
 import Data.Typeable (Typeable)
 import Database.Persist.Class (PersistField (..))
 import Database.Persist.Sql (PersistFieldSql (..))
 import Database.Persist.Types (SqlType (..))
+import Test.QuickCheck
 import Web.PathPieces
 import qualified Data.Aeson as A
 import qualified Data.Text  as T
+
+#if !MIN_VERSION_base(4,8,0)
+import Control.Applicative ((<$>))
+#endif
 
 -- | This exception is thrown by 'mkSlug' when its input cannot be converted
 -- into proper 'Slug'.
@@ -43,7 +50,7 @@ data SlugException
   = InvalidInput Text  -- ^ Slug cannot be generated for given text
   | InvalidSlug  Text  -- ^ Input is not a valid slug, see 'parseSlug'
   | InvalidLength Int  -- ^ Requested slug length is not a positive number
- deriving (Typeable)
+ deriving (Eq, Typeable)
 
 instance Show SlugException where
   show (InvalidInput text) = "Cannot build slug for " ++ show text
@@ -153,3 +160,6 @@ instance PersistFieldSql Slug where
 instance PathPiece Slug where
   fromPathPiece = parseSlug
   toPathPiece   = unSlug
+
+instance Arbitrary Slug where
+  arbitrary = fromJust <$> (mkSlug . T.pack <$> arbitrary) `suchThat` isJust

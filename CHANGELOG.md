@@ -1,3 +1,13 @@
+## Slug 0.1.6
+
+* Allowed Aeson 1.1.
+
+* Switched to Hspec for test suite.
+
+* Made public `Arbitrary` instance for `Slug`.
+
+* Derived `Eq` for `SlugException`.
+
 ## Slug 0.1.5
 
 * Allow Aeson 1.0.
