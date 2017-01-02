@@ -10,6 +10,10 @@
 
 * Drop support for GHC 7.6.
 
+* Started to use the derived `Show` instance for `SlugException`.
+  Human-friendly version goes to `Exception`'s method `displayException`
+  instead.
+
 ## Slug 0.1.5
 
 * Allow Aeson 1.0.

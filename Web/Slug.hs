@@ -22,7 +22,7 @@ module Web.Slug
   , SlugException (..) )
 where
 
-import Control.Exception (Exception)
+import Control.Exception (Exception (..))
 import Control.Monad ((>=>), liftM)
 import Control.Monad.Catch (MonadThrow (..))
 import Data.Aeson.Types (ToJSON (..), FromJSON (..))
@@ -50,14 +50,14 @@ data SlugException
   = InvalidInput Text  -- ^ Slug cannot be generated for given text
   | InvalidSlug  Text  -- ^ Input is not a valid slug, see 'parseSlug'
   | InvalidLength Int  -- ^ Requested slug length is not a positive number
- deriving (Eq, Typeable)
+ deriving (Eq, Show, Typeable)
 
-instance Show SlugException where
-  show (InvalidInput text) = "Cannot build slug for " ++ show text
-  show (InvalidSlug  text) = "The text is not a valid slug " ++ show text
-  show (InvalidLength n)   = "Invalid slug length: " ++ show n
-
-instance Exception SlugException
+instance Exception SlugException where
+#if MIN_VERSION_base(4,8,0)
+  displayException (InvalidInput text) = "Cannot build slug for " ++ show text
+  displayException (InvalidSlug  text) = "The text is not a valid slug " ++ show text
+  displayException (InvalidLength n)   = "Invalid slug length: " ++ show n
+#endif
 
 -- | Slug. Textual value inside is always guaranteed to have the following
 -- qualities:
@@ -152,7 +152,13 @@ instance FromJSON Slug where
 instance PersistField Slug where
   toPersistValue   = toPersistValue . unSlug
   fromPersistValue =
-    fromPersistValue >=> either (Left . T.pack . show) Right . parseSlug
+    fromPersistValue >=> either (Left . T.pack . f) Right . parseSlug
+    where
+#if MIN_VERSION_base(4,8,0)
+      f = displayException
+#else
+      f = show
+#endif
 
 instance PersistFieldSql Slug where
   sqlType = const SqlString
