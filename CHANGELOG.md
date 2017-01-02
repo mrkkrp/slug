@@ -14,6 +14,8 @@
   Human-friendly version goes to `Exception`'s method `displayException`
   instead.
 
+* Added instances of `ToHttpApiData` and `FromHttpApiData` for `Slug`.
+
 ## Slug 0.1.5
 
 * Allow Aeson 1.0.

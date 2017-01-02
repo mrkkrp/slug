@@ -35,6 +35,7 @@ import Database.Persist.Class (PersistField (..))
 import Database.Persist.Sql (PersistFieldSql (..))
 import Database.Persist.Types (SqlType (..))
 import Test.QuickCheck
+import Web.HttpApiData
 import Web.PathPieces
 import qualified Data.Aeson as A
 import qualified Data.Text  as T
@@ -166,6 +167,18 @@ instance PersistFieldSql Slug where
 instance PathPiece Slug where
   fromPathPiece = parseSlug
   toPathPiece   = unSlug
+
+instance ToHttpApiData Slug where
+  toUrlPiece = unSlug
+
+instance FromHttpApiData Slug where
+  parseUrlPiece = either (Left . T.pack . f) Right . parseSlug
+    where
+#if MIN_VERSION_base(4,8,0)
+      f = displayException
+#else
+      f = show
+#endif
 
 instance Arbitrary Slug where
   arbitrary = fromJust <$> (mkSlug . T.pack <$> arbitrary) `suchThat` isJust

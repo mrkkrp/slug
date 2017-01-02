@@ -42,6 +42,7 @@ import Data.Maybe (isJust, isNothing)
 import Data.Text (Text)
 import Test.Hspec
 import Test.QuickCheck
+import Web.HttpApiData
 import Web.PathPieces
 import Web.Slug
 import qualified Data.Text as T
@@ -87,6 +88,9 @@ spec = do
     it "valid Slug text is a valid path piece" $
       property $ \slug ->
         fromPathPiece (unSlug slug) === Just slug
+    it "valid Slug text is a valid HTTP API data" $
+      property $ \slug ->
+        parseUrlPiece (toUrlPiece slug) === Right (slug :: Slug)
   describe "mkSlug" $ do
     it "Slug transformation in idempotent" $
       property $ \x ->
