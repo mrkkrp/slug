@@ -93,7 +93,7 @@ mkSlug text =
      then throwM (InvalidInput text)
      else return . Slug . T.intercalate "-" $ ws
 
--- | Get textual representation if 'Slug'.
+-- | Get textual representation of 'Slug'.
 
 unSlug :: Slug -> Text
 unSlug (Slug x) = x
