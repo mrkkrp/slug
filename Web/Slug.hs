@@ -45,7 +45,7 @@ import Control.Applicative ((<$>))
 #endif
 
 -- | This exception is thrown by 'mkSlug' when its input cannot be converted
--- into proper 'Slug'.
+-- into a proper 'Slug'.
 
 data SlugException
   = InvalidInput Text  -- ^ Slug cannot be generated for given text
@@ -74,12 +74,12 @@ instance Exception SlugException where
 
 newtype Slug = Slug Text deriving (Eq, Ord, Data, Typeable)
 
--- | Create 'Slug' from 'Text', all necessary transformations are
+-- | Create a 'Slug' from a 'Text' value, all necessary transformations are
 -- applied. Argument of this function can be title of an article or
 -- something like that.
 --
--- Note that result is inside 'MonadThrow', that means you can just get it
--- in 'Maybe', in more complex contexts it will throw 'SlugException'
+-- Note that the result is inside 'MonadThrow', that means you can just get
+-- it in 'Maybe', in more complex contexts it will throw 'SlugException'
 -- exception using 'InvalidInput' constructor.
 --
 -- This function also has a useful property:
@@ -93,22 +93,22 @@ mkSlug text =
      then throwM (InvalidInput text)
      else return . Slug . T.intercalate "-" $ ws
 
--- | Get textual representation of 'Slug'.
+-- | Get textual representation of a 'Slug'.
 
 unSlug :: Slug -> Text
 unSlug (Slug x) = x
 
--- | Convert 'Text' to possibly empty collection of words. Every word is
--- guaranteed to be non-empty alpha-numeric lowercased sequence of
+-- | Convert 'Text' to a possibly empty collection of words. Every word is
+-- guaranteed to be non-empty alpha-numeric lower-cased sequence of
 -- characters.
 
 getSlugWords :: Text -> [Text]
 getSlugWords = T.words . T.toLower . T.map f . T.replace "'" ""
   where f x = if isAlphaNum x then x else ' '
 
--- | Convert 'Text' into 'Slug' only when it is already valid slug.
+-- | Convert a 'Text' into a 'Slug' only when it is already valid slug.
 --
--- This function can throw 'SlugException' exception using 'InvalidSlug'
+-- This function can throw the 'SlugException' exception using 'InvalidSlug'
 -- constructor.
 
 parseSlug :: MonadThrow m => Text -> m Slug
