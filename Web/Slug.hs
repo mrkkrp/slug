@@ -29,6 +29,7 @@ import Data.Aeson.Types (ToJSON (..), FromJSON (..))
 import Data.Char (isAlphaNum)
 import Data.Data (Data)
 import Data.Maybe (isJust, fromJust)
+import Data.Semigroup
 import Data.Text (Text)
 import Data.Typeable (Typeable)
 import Database.Persist.Class (PersistField (..))
@@ -73,6 +74,9 @@ instance Exception SlugException where
 -- sort in some cases.
 
 newtype Slug = Slug Text deriving (Eq, Ord, Data, Typeable)
+
+instance Semigroup Slug where
+  x <> y = Slug (unSlug x <> "-" <> unSlug y)
 
 -- | Create a 'Slug' from a 'Text' value, all necessary transformations are
 -- applied. Argument of this function can be title of an article or

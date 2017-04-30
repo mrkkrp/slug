@@ -39,6 +39,7 @@ import Control.Monad ((>=>))
 import Data.Char (isAlphaNum, isUpper)
 import Data.Function (on)
 import Data.Maybe (isJust, isNothing)
+import Data.Semigroup
 import Data.Text (Text)
 import Test.Hspec
 import Test.QuickCheck
@@ -91,6 +92,12 @@ spec = do
     it "valid Slug text is a valid HTTP API data" $
       property $ \slug ->
         parseUrlPiece (toUrlPiece slug) === Right (slug :: Slug)
+  describe "Semigroup instance of Slug" $
+    it "the (<>) operation produces valid slugs in all cases" $
+      property $ \x y -> do
+        let slug = unSlug (x <> y)
+        slug' <- unSlug <$> parseSlug slug
+        slug' `shouldBe` slug
   describe "mkSlug" $ do
     it "Slug transformation in idempotent" $
       property $ \x ->

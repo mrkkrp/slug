@@ -1,3 +1,7 @@
+## Slug 0.1.7
+
+* Define `Semigroup` instance for `Slug`.
+
 ## Slug 0.1.6
 
 * Allowed Aeson 1.1.
