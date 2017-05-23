@@ -23,7 +23,7 @@ module Web.Slug
 where
 
 import Control.Exception (Exception (..))
-import Control.Monad ((>=>), liftM)
+import Control.Monad
 import Control.Monad.Catch (MonadThrow (..))
 import Data.Aeson.Types (ToJSON (..), FromJSON (..))
 import Data.Char (isAlphaNum)
@@ -42,7 +42,7 @@ import qualified Data.Aeson as A
 import qualified Data.Text  as T
 
 #if !MIN_VERSION_base(4,8,0)
-import Control.Applicative ((<$>))
+import Control.Applicative
 #endif
 
 -- | This exception is thrown by 'mkSlug' when its input cannot be converted
@@ -79,7 +79,7 @@ instance Semigroup Slug where
   x <> y = Slug (unSlug x <> "-" <> unSlug y)
 
 -- | Create a 'Slug' from a 'Text' value, all necessary transformations are
--- applied. Argument of this function can be title of an article or
+-- applied. The argument of this function can be title of an article or
 -- something like that.
 --
 -- Note that the result is inside 'MonadThrow', that means you can just get
@@ -108,7 +108,8 @@ unSlug (Slug x) = x
 
 getSlugWords :: Text -> [Text]
 getSlugWords = T.words . T.toLower . T.map f . T.replace "'" ""
-  where f x = if isAlphaNum x then x else ' '
+  where
+    f x = if isAlphaNum x then x else ' '
 
 -- | Convert a 'Text' into a 'Slug' only when it is already valid slug.
 --
@@ -117,10 +118,11 @@ getSlugWords = T.words . T.toLower . T.map f . T.replace "'" ""
 
 parseSlug :: MonadThrow m => Text -> m Slug
 parseSlug v = mkSlug v >>= check
-  where check s =
-          if unSlug s == v
-          then return s
-          else throwM (InvalidSlug v)
+  where
+    check s =
+      if unSlug s == v
+        then return s
+        else throwM (InvalidSlug v)
 
 -- | Ensure that given 'Slug' is not longer than given maximum number of
 -- characters. If truncated slug ends in a dash, remove that dash too. (Dash

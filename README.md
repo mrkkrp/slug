@@ -8,7 +8,7 @@
 [![Coverage Status](https://coveralls.io/repos/mrkkrp/slug/badge.svg?branch=master&service=github)](https://coveralls.io/github/mrkkrp/slug?branch=master)
 
 This is a [slug](https://en.wikipedia.org/wiki/Semantic_URL#Slug)
-implementation that plays nicely with [Yesod](http://www.yesodweb.com/)
+implementation that plays nicely with the [Yesod](http://www.yesodweb.com/)
 ecosystem. Although it's fairly easy to write this thing, slugs are useful
 and general enough to be coded once and be used again and again. So this
 little package eliminates some boilerplate you might find yourself writing.
@@ -16,7 +16,7 @@ little package eliminates some boilerplate you might find yourself writing.
 ## Quick start
 
 The package provides the data type `Slug` that is an instance of various
-type classes, so it can be used with Persistent or as part of a route. It
+type classes, so it can be used with Persistent or as a part of a route. It
 also works with the `aeson` package.
 
 The slugs are completely type-safe. When you have a `Slug`, you can be sure
