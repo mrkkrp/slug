@@ -1,6 +1,8 @@
 ## Slug 0.1.7
 
-* Define `Semigroup` instance for `Slug`.
+* Defined `Semigroup` instance for `Slug`.
+
+* Improved documentation and metadata.
 
 ## Slug 0.1.6
 
