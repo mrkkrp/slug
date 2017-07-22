@@ -4,7 +4,7 @@
 module Main (main) where
 
 import Control.Monad ((>=>))
-import Data.Char (isAlphaNum, isUpper)
+import Data.Char (isAlphaNum)
 import Data.Function (on)
 import Data.Maybe (isJust, isNothing)
 import Data.Semigroup
@@ -42,9 +42,9 @@ spec = do
     it "does not contain empty words between dashes" $
       property $ \slug ->
         T.splitOn "-" (unSlug slug) `shouldNotSatisfy` any T.null
-    it "no upper-cased chars found in slugs" $
-      property $ \slug ->
-        unSlug slug `shouldNotSatisfy` T.any isUpper
+    -- it "no upper-cased chars found in slugs" $
+    --   property $ \slug ->
+    --     unSlug slug `shouldNotSatisfy` T.any isUpper
     it "showed Slug looks the same as its inner Text" $
       property $ \slug ->
         show slug === show (unSlug slug)
