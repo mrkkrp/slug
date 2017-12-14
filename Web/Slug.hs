@@ -73,7 +73,10 @@ instance Exception SlugException where
 -- Slugs are good for semantic URLs and also can be used as identifier of a
 -- sort in some cases.
 
-newtype Slug = Slug Text deriving (Eq, Ord, Data, Typeable)
+newtype Slug = Slug Text
+  deriving (Eq, Ord, Data, Typeable)
+
+-- | @since 0.1.7
 
 instance Semigroup Slug where
   x <> y = Slug (unSlug x <> "-" <> unSlug y)
@@ -143,6 +146,8 @@ truncateSlug n v
 instance Show Slug where
   show = show . unSlug
 
+-- | @since 0.1.1
+
 instance Read Slug where
   readsPrec n = (readsPrec n :: ReadS Text) >=> f
     where f (s, t) = (,t) `liftM` parseSlug s
@@ -174,8 +179,12 @@ instance PathPiece Slug where
   fromPathPiece = parseSlug
   toPathPiece   = unSlug
 
+-- | @since 0.1.6
+
 instance ToHttpApiData Slug where
   toUrlPiece = unSlug
+
+-- | @since 0.1.6
 
 instance FromHttpApiData Slug where
   parseUrlPiece = either (Left . T.pack . f) Right . parseSlug
@@ -185,6 +194,8 @@ instance FromHttpApiData Slug where
 #else
       f = show
 #endif
+
+-- | @since 0.1.6
 
 instance Arbitrary Slug where
   arbitrary = fromJust <$> (mkSlug . T.pack <$> arbitrary) `suchThat` isJust
