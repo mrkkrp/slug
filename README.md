@@ -5,7 +5,6 @@
 [![Stackage Nightly](http://stackage.org/package/slug/badge/nightly)](http://stackage.org/nightly/package/slug)
 [![Stackage LTS](http://stackage.org/package/slug/badge/lts)](http://stackage.org/lts/package/slug)
 [![Build Status](https://travis-ci.org/mrkkrp/slug.svg?branch=master)](https://travis-ci.org/mrkkrp/slug)
-[![Coverage Status](https://coveralls.io/repos/mrkkrp/slug/badge.svg?branch=master&service=github)](https://coveralls.io/github/mrkkrp/slug?branch=master)
 
 This is a [slug](https://en.wikipedia.org/wiki/Semantic_URL#Slug)
 implementation that plays nicely with the [Yesod](http://www.yesodweb.com/)

@@ -7,7 +7,6 @@ import Control.Monad ((>=>))
 import Data.Char (isAlphaNum)
 import Data.Function (on)
 import Data.Maybe (isJust, isNothing)
-import Data.Semigroup
 import Data.Text (Text)
 import Test.Hspec
 import Test.QuickCheck
@@ -18,6 +17,9 @@ import qualified Data.Text as T
 
 #if !MIN_VERSION_base(4,8,0)
 import Control.Applicative ((<$>))
+#endif
+#if !MIN_VERSION_base(4,11,0)
+import Data.Semigroup
 #endif
 
 main :: IO ()

@@ -29,7 +29,6 @@ import Data.Aeson.Types (ToJSON (..), FromJSON (..))
 import Data.Char (isAlphaNum)
 import Data.Data (Data)
 import Data.Maybe (isJust, fromJust)
-import Data.Semigroup
 import Data.Text (Text)
 import Data.Typeable (Typeable)
 import Database.Persist.Class (PersistField (..))
@@ -43,6 +42,9 @@ import qualified Data.Text  as T
 
 #if !MIN_VERSION_base(4,8,0)
 import Control.Applicative
+#endif
+#if !MIN_VERSION_base(4,11,0)
+import Data.Semigroup
 #endif
 
 -- | This exception is thrown by 'mkSlug' when its input cannot be converted
