@@ -40,9 +40,6 @@ import Web.PathPieces
 import qualified Data.Aeson as A
 import qualified Data.Text  as T
 
-#if !MIN_VERSION_base(4,8,0)
-import Control.Applicative
-#endif
 #if !MIN_VERSION_base(4,11,0)
 import Data.Semigroup
 #endif
@@ -57,11 +54,9 @@ data SlugException
  deriving (Eq, Show, Typeable)
 
 instance Exception SlugException where
-#if MIN_VERSION_base(4,8,0)
   displayException (InvalidInput text) = "Cannot build slug for " ++ show text
   displayException (InvalidSlug  text) = "The text is not a valid slug " ++ show text
   displayException (InvalidLength n)   = "Invalid slug length: " ++ show n
-#endif
 
 -- | Slug. Textual value inside is always guaranteed to have the following
 -- qualities:
@@ -168,11 +163,7 @@ instance PersistField Slug where
   fromPersistValue =
     fromPersistValue >=> either (Left . T.pack . f) Right . parseSlug
     where
-#if MIN_VERSION_base(4,8,0)
       f = displayException
-#else
-      f = show
-#endif
 
 instance PersistFieldSql Slug where
   sqlType = const SqlString
@@ -191,11 +182,7 @@ instance ToHttpApiData Slug where
 instance FromHttpApiData Slug where
   parseUrlPiece = either (Left . T.pack . f) Right . parseSlug
     where
-#if MIN_VERSION_base(4,8,0)
       f = displayException
-#else
-      f = show
-#endif
 
 -- | @since 0.1.6
 

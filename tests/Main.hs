@@ -15,9 +15,6 @@ import Web.PathPieces
 import Web.Slug
 import qualified Data.Text as T
 
-#if !MIN_VERSION_base(4,8,0)
-import Control.Applicative ((<$>))
-#endif
 #if !MIN_VERSION_base(4,11,0)
 import Data.Semigroup
 #endif
